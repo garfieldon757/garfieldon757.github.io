@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta name="keywords" content="hexo, autumn" />
+    <title>
+        Hexo
+    </title>
+    <!-- favicon -->
+    
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/frontendsophie/hexo-theme-autumn@1.0.0/source/img/favicon.ico" />
+     
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- highlight -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" />
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad()
+    </script>
+    <script src="https://cdn.jsdelivr.net/gh/frontendsophie/hexo-infinite-scroll@2.0.0/dist/main.js"></script>
+
+    <script>
+        infiniteScroll()
+
+        window.addEventListener('DOMContentLoaded', function () {
+            const [
+                mainTitle,
+                mobileMenu,
+                mobileMainTitle,
+                mobileMenuBtn,
+                ipadMenuBtn,
+                aside,
+                closeBtn,
+            ] = getEle(
+                '#main-title',
+                '.mobile-menu',
+                '.mobile-menu h3',
+                '.mobile-menu button',
+                '.ipad-menu',
+                'aside',
+                'aside .close',
+            )
+            const io = new IntersectionObserver(entries => {
+                if (entries[0].intersectionRatio <= 0) {
+                    mobileMainTitle.classList.remove('invisibile')
+                } else {
+                    mobileMainTitle.classList.add('invisibile')
+                }
+            })
+            io.observe(mainTitle)
+
+            clickToggleAside(mobileMenuBtn)
+            clickToggleAside(ipadMenuBtn)
+            clickToggleAside(closeBtn, false)
+
+            const isMenuVisible = window.getComputedStyle(mobileMenu).display !== 'none'
+            if (isMenuVisible) document.body.style.background = 'none'
+
+            function getEle(...args) {
+                return args.map(arg => document.querySelector(arg))
+            }
+
+            function clickToggleAside(btn, show = true) {
+                btn.addEventListener('click', function () {
+                    if (show) {
+                        aside.style.display = 'block'
+                    } else {
+                        aside.style.display = 'none'
+                    }
+                })
+            }
+        })
+    </script>
+<meta name="generator" content="Hexo 4.1.1"></head>
+
+<body style="background: url(https://cdn.jsdelivr.net/gh/frontendsophie/hexo-theme-autumn@1.0.0/source/img/button-bg.png) #f3f3f3">
+    <div class="container">
+        <header class="header">
+    <nav class="mobile-menu" style="background: url(https://cdn.jsdelivr.net/gh/frontendsophie/hexo-theme-autumn@1.0.0/source/img/button-bg.png) #f3f3f3">
+        <h3 class="invisibile">
+            <a href="/" class="logo">
+                Hexo
+            </a>
+        </h3>
+        <button class="menu">menu</button>
+    </nav>
+
+    <button class="ipad-menu menu">menu</button>
+
+    <h1 class="title" id="main-title">
+        <a href="/" class="logo">
+            Hexo
+        </a>
+    </h1>
+    <h2 class="desc">
+        
+    </h2>
+
+    <div class="links">
+        <ul>
+            
+            <li>
+                <a href="https://github.com/FrontendSophie" target="_blank" rel="noopener">
+                    Github
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://www.linkedin.com/in/frontendsophie/" target="_blank" rel="noopener">
+                    LinkedIn
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+</header>
+        <main class="main">
+            <article class="post">
+    
+    
+    
+    <h2 class="post-title">
+        资源预加载在打车H5中的实践心得
+    </h2>
+    <ul class="post-date">
+        <li>
+            2019-12-15
+        </li>
+        <li>
+            John Doe
+        </li>
+    </ul>
+    <div class="post-content">
+        <p>##背景</p>
+<p>性能优化工作是软件开发中经久不衰的经典话题，如何降低H5页面的加载耗时，让用户体验秒开页面的顺畅体验，是开发RD一直追求的目标。</p>
+<p>其中预加载资源是一种经典的性能优化方案：资源预加载 是app提前加载所需资源文件，用户打开页面时可以直接使用缓存起来的文件，减少了资源请求时间耗费，提升了用户体验。</p>
+<p>本文主要介绍了美团打车SPA应用中，资源预加载方案的使用方案和心得。</p>
+<p>##问题分析</p>
+<p>我们的打车H5项目是单页应用，即在页面的跳转的过程中，用户感受到的时间耗费，包含了对异步页面资源进行请求加载、以及页面资源的解析和渲染。而这些过程中，异步资源的请求加载作为页面渲染的前置工作，成为影响整体跳转速度不可避免的客观因素。用户的直接感受就是跳转过程卡顿，耗时较长。</p>
+<p>我们针对这一问题尝试引入资源预加载方案：</p>
+<p>从方案原理上分析，如果能在前一页面就预先将这个资源文件进行请求，并存储在浏览器缓存中；在真正跳转的时候，异步资源会直接命中缓存获取到资源文件；这样可以直接替用户节省整个的资源请求时间，大大减少了跳转新页面的耗时。</p>
+<p>从量化的角度分析具体的收益比例，根据CAT线上统计数据显示，打车H5用户异步页面跳转平均耗时为 …s，平均异步资源请求耗时为… s；也就是说预加载节省掉的请求耗时，可以将异步跳转时间降低大约 %；预期效果还是比较显著的。</p>
+<p>综上所述，通过预加载来优化页面跳转耗时问题，是有显著的预期收益。</p>
+<p>那接下来，我们针对预加载方案的工作进行拆分，抽取为如下子任务：</p>
+<p>预加载方案具体流程？</p>
+<p>如何设计指标来衡量预加载工作的有效性？</p>
+<p>异步资源预加载方案的副作用有哪些？如何避免？</p>
+<p>接下来我们针对解决方案和技术细节做以整理。</p>
+<p>##解决方案</p>
+<p>针对我们对预加载问题的分析，下面我们给予详细的解决方案。</p>
+<p>【问题一】：预加载方案具体流程？</p>
+<p>讨论到方案的核心流程，我们希望在真正的页面跳转时，异步资源已经缓存在浏览器中。所以我们需要做的就只是在前一个路由页面中，提前完成对应异步资源的请求并缓存。</p>
+<p>大致工作比较简单，</p>
+<p>梳理出app中的页面跳转脑图[附1]；</p>
+<p>在跳转前一路由页面中，对潜在跳转页面对应的异步页面资源进行手动加载，并借助浏览器的缓存机制将资源缓存；</p>
+<p>【问题二】：如何设计指标来衡量预加载工作的有效性？</p>
+<p>1.体现预加载对项目的覆盖程度</p>
+<p>我们期待尽可能多的为用户进行资源预加载，降低页面跳转耗时。</p>
+<p>2.体现对用户使用资源作出预测的准确性</p>
+<p>我们期待用户能够最大程度的使用到我为预加载的资源，这个要求预加载的准确性需要有一定的预估。</p>
+<p>3.体现页面跳转时间的优化程度</p>
+<p>【问题三】：异步资源预加载方案的副作用有哪些？如何避免？</p>
+<p>基本的预加载工作基本满足了预期的需求，但是预加载带给项目本身了一些副作用，依然很有必要我们保持关注。</p>
+<p>1.干扰页面的正常渲染/执行；</p>
+<p>如果预加载的时机选择如果不合适，干扰到当前页面的资源加载和页面渲染工作，给用户带来卡顿的不好用户体验，这样的负面影响显然是我们不期望看到的；</p>
+<p>所以我们还需要考虑选择合适的时机去开启预加载工作，但是这个合理时机是什么呢？需要考虑什么因素呢？</p>
+<p>我们暂时将满足上述两个需求的时机，认定为合理的预加载时机。</p>
+<p>浏览器（JS线程/UI线程）空闲时加载</p>
+<p>避免和其他xhr请求并行占用带宽，在请求空闲时加载</p>
+<pre><code>2. 不必要的网络流量耗费；</code></pre><p>如果我们大面积的对资源引入预加载机制，用户的跳转耗时自然会适当降低；但是与此同时，大量的资源加载是用户并未命中的，这其中会造成用户大量的流量损耗。</p>
+<p>所以如何更精准的预加载资源，我们的解决思路如下。</p>
+<p>借助cat统计大盘数据，对页面的跳转比例进行排序；选择一个合适的阈值，高于该阈值的认定为高频跳转路径，引入预加载；（大盘粒度）</p>
+<p>针对更细的粒度，我们可以考虑针对具体用户，对其历史跳转路径数据进行排序，选取阈值，对高频路径引入预加载；（用户粒度）</p>
+<p>##方案实现</p>
+<p>根据技术方案的设计规划，我们可以初步生成我们的方案流程图，如下：</p>
+<p>我们可以将预加载方案的整个流程抽取为：预加载资源模块，指标设计实现模块、空闲检测模块、策略优化模块。</p>
+<p>1.预加载资源</p>
+<p>这一模块我们希望选择合适的技术方案，对指定资源实现加载的工作。</p>
+<p>加载js资源有两种常用的加载方式，利用script标签引入、利用webpack的引入资源引入方式；这两种方式各有利弊，我们进行对比。</p>
+<p>引入方式</p>
+<p>优点</p>
+<p>缺点</p>
+<p>script标签引入</p>
+<p>单纯的引入资源，无侵入性；</p>
+<p>1.线上js文件名有hash值，引入时路径处理较麻烦；</p>
+<ol start="2">
+<li>没有api可控操作；</li>
+</ol>
+<p>webpackAPI-import引入</p>
+<p>可以直接使用内存中的文件，无需走强缓存</p>
+<link rel="prefetch" href="xx.js">
+
+<p>浏览器自行触发预加载</p>
+<p>1.加载时间不确切；</p>
+<p>2.没有api可控操作</p>
+<p>综上优劣分析，后者的技术方案在可实施性更胜一筹，于是决定采用。</p>
+<p>2.指标设计实现</p>
+<p>这一模块我们希望对预加载状况进行感知，指导参数调整，更充分的应用预加载的优化能力。</p>
+<p>为了看到进行预加载的比例，这可以反映我们进行预加载的时间点的合理性；我们根据这一条需求建立了指标“触发率</p>
+<p>触发率： triggerRate = 资源加载量 / 页面加载量；</p>
+<p>为了看到用户使用到预加载产生的缓存资源的比例，这可以反映出预加载工作的有效性；我们根据这一条需求建立了指标“命中率”</p>
+<p>命中率： hitRate = 使用预加载的资源量 / 资源加载量；</p>
+<p>我们希望能够看到预加载前后，页面跳转的耗时对比，这能够反映出预加载工作在用户体验角度上的效果；我们根据这一条需求建立了指标“页面跳转时间”</p>
+<p>页面跳转时间：page_duration = 组件挂载时间戳 - 前置页面beforeLeave时间戳</p>
+<p>我们预加载的终极目标，是希望降低用户的页面跳转时间。</p>
+<p>而为了达到这个目的，我们希望能够让前两个指标“触发率”、“命中率”尽可能的提高，这样预加载工作生效的比例就会提高，进而降低页面跳转时间。</p>
+<p>而为了提高这两个指标，我们需要反复尝试调整方案中的相关参数，如：预加载的调用时机、空闲检测的阈值（下一节会介绍）、加载失败的重试间隔时长等。</p>
+<p>3.浏览器空闲检测</p>
+<p>在预加载基本方案完成后，我们需要对方案对项目本身可能带来的副作用做分析和应对。</p>
+<p>其中有一个显著的副作用是，如果在浏览器繁忙时开启预加载工作，有可能影响正常功能的使用，降低用户的交互体验。针对这个问题，我们希望预先对浏览器的空闲检测，探测空闲时再开启预加载。</p>
+<p>针对空闲检测是业界目前还没用规范做法的一项工作，所以我们需要调研，并提出自己的空闲检测方案。</p>
+<p>首先，我们需要梳理清楚浏览器空闲究竟应该怎样定义？</p>
+<p>我们之所以进行空闲检测，终极目的还是不阻塞正常的页面加载和执行，基于这种前提，我们可以简单的将检测工作细化为以下三项工作。</p>
+<p>序号</p>
+<p>浏览器运行模块</p>
+<p>空闲检测对象</p>
+<p>1</p>
+<p>js运行(js代码、人机交互)</p>
+<p>JS线程</p>
+<p>2</p>
+<p>页面渲染</p>
+<p>UI线程</p>
+<p>3</p>
+<p>网络请求</p>
+<p> 网络带宽占用情况</p>
+<p>接下来，针对不同的对象侦测空闲，具体的代码实现如下；</p>
+<p> UI线程空闲检测</p>
+<p>d1 = new Date()</p>
+<p>requestAnimationFrame(()=＞{</p>
+<pre><code>offset = new Date() - d1
+
+if ( offset &lt; 30 ) { // UI线程空闲 }</code></pre><p>})</p>
+<p>offset小于某个阈值即认为空闲。原理是requestAnimationFrame请求一次帧渲染，当渲染引擎繁忙时，回调延时也会变大。</p>
+<p>关于这个offset阈值如何确定，我们可以先借助项目中的一个静态页面作为实验对象，我们有理由推断这个页面在绝大多数时间是空闲的。我们接下来运行代码并将offset数值上报给统计平台。我们针对一定时间段的统计数据去平均，来作为这个阈值的参考值。</p>
+<p>PS：针对JS的空闲检测，业界也有一些第三方实现的方案，一个比较典型的实现是react 16中提供了空闲检测算法, 思路是借助浏览器API-requestIdleFrameCallback，具体见参考[6]。 </p>
+<p>JS线程空闲检测</p>
+<p>d1 = new Date();</p>
+<p>setTimeout(()=＞{ </p>
+<pre><code>offset = new Date() - d1
+
+if (offset &lt; 25 ) { // JS线程空闲 }</code></pre><p>}), 20);</p>
+<p>offset小于某个阈值即认为空闲。原理就是js是单线程的，cpu繁忙的时候setTimeout延时会出现偏差.</p>
+<p>网络带宽占用情况 *</p>
+<p>由于网络请求中，绝大多数的xhr请求是异步的，侦测工作较大；</p>
+<p>所以在方案中，我们暂时对这一部分的侦测略过。</p>
+<p>4.加载策略优化</p>
+<p>我们预加载工作带来的另一个副作用，就是一些资源被预加载但用户未使用，这些都是用户的流量浪费；</p>
+<p>这个问题的优化思路是，提高资源预加载的精准程度；</p>
+<p>在这一问题上，我们从两个维度上做了尝试。</p>
+<p>我们通过结合用户行为数据平台，利用薪火平台提供的流量漏斗模型，将页面间的跳转比例统计并排序；</p>
+<p>我们通过确定一个跳转比例阈值，将跳转比例高的一些页面开启预加载。低比例的页面认定资源浪费概率大，关闭预加载。</p>
+<p>这里我们希望做一个延伸思考，这里的跳转比例数据粒度，如果从大盘粒度缩小至用户粒度，获取当前用户的历史页面跳转统计信息。然后对数据排序，选定阈值并精准的制定预加载策略。</p>
+<p>做一些精细化的挖掘工作，意义如何，这里留作延展和思考。*</p>
+<p>我们通过自定义指标“命中率”，也可以帮助筛选掉一些预加载意义不大的页面资源。</p>
+<p>##规划和思考</p>
+<p>其实在Web预加载的这件技术方案选型上，近些年很多新的API出现在提案甚至应用在部分浏览器中，我们在最初的技术选型时也针对相关的方案进行了调研，将调研结论在这里简单梳理下。</p>
+<p>预加载相关标签属性梳理</p>
+<p>W3C近些年引入了一些预加载相关的浏览器规范的标签属性，能够利用浏览器自身的能力去完成预加载工作。这里</p>
+<p>技术方案</p>
+<p>应用方式</p>
+<p>优点</p>
+<p>缺点</p>
+<p>备注</p>
+<p>DNS prefetch标签</p>
+<link rel="dns-prefetch" href="//example.com">
+
+<p>1.优先进行DNS查询；</p>
+<p>1.chrome也会做相关工作，意义不是很大；</p>
+<p>Preconnect标签</p>
+<link rel="preconnect" href="//xx.com">
+
+<p>1.优先建立DNS查询&amp;Tcp连接，节约后续请求耗时；</p>
+<p>prefetch标签</p>
+<link rel="prefetch" href="image.png">
+
+<p>1.适合加载低优资源；</p>
+<p>(部分浏览器会在空闲时加载，属于最佳实践)</p>
+<p>1.不同的浏览器的触发时机可能不同，甚至有可能不被加载；</p>
+<p>​pick</p>
+<p>preload标签</p>
+<link rel="preload" href="image.png">
+
+<p>1.适合加载高优资源；</p>
+<p>（如字体文件）</p>
+<p>2.可以根据资源MIME类型，区分加载资源优先级；</p>
+<p>3.可以自行控制加载后运行顺序和逻辑；</p>
+<p>1.强制加载，对当前页面性能有影响；</p>
+<p>Subresource标签</p>
+<link rel="subresource" href="styles.css">
+
+<p>1.声明加载当前页面高优资源；</p>
+<p>1.和preload相比，无法设置加载资源的优先级；</p>
+<p>preRender标签</p>
+<link rel="prerender" href="/thenextpage.html" />
+
+<p>1.在后台完成页面级别的加载和执行，极大提升用户体验；</p>
+<p>1.需要精准预测，否则会有大量的资源耗费；</p>
+<p>由于标签的支持有限，PC端的支持又好于mobile端的支持程度，所以这些特性更适合采用渐进增强的形式应用在系统中。</p>
+<p>另外，webpack针对prefetch和preload标签做了支持，可以在注解中添加关键字使用特性。</p>
+<p>浏览器API</p>
+<p>空闲检测 是希望做懒加载、预加载等性能优化工作的前置工作。为了提供web开发这对空闲时间的可控和利用，浏览器也推出了空闲检测相关的API：requestIdleFrameCallback[6]。</p>
+<p>这个接口可以精准判断当前UI渲染帧内，是否存在空闲的时间；这样的能力给了web开发方便的检测浏览器空闲，并完成所希望的工作。</p>
+<p>但是不足是1.兼容性较低；2.这个空闲更多的是指向UI线程空闲，不能完整的代表浏览器的空闲。</p>
+<p>空闲检测算法实现</p>
+<p>由于利于浏览器标准提供的预加载标签属性，可以利用浏览器内部机制完成空闲检测和预加载的全套工作，非常简便；</p>
+<p>只是目前受限于一些问题，诸如兼容程度低，并且由于空闲检测算法黑盒，导致可控性低，没法自行设立指标对预加载带来的收益作出评价等。</p>
+<p>所以一些第三方开发者，有了自主实现的空闲检测算法，其中最有名的就是react引入的算法[8]。</p>
+<p>##参考</p>
+<p>[1] preload W3C文档：<a href="https://www.w3.org/TR/preload/" target="_blank" rel="noopener">https://www.w3.org/TR/preload/</a></p>
+<p>[2] prefetch W3C文档： <a href="https://www.w3.org/TR/resource-hints/#prefetch" target="_blank" rel="noopener">https://www.w3.org/TR/resource-hints/#prefetch</a></p>
+<p>[3] prefetch MDN使用手册： <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Link_prefetching_FAQ" target="_blank" rel="noopener">https://developer.mozilla.org/en-US/docs/Web/HTTP/Link_prefetching_FAQ</a></p>
+<p>[4] webpack prefetch/preload文档： <a href="https://webpack.docschina.org/guides/code-splitting/#%E9%A2%84%E5%8F%96-%E9%A2%84%E5%8A%A0%E8%BD%BD%E6%A8%A1%E5%9D%97-prefetch-preload-module-" target="_blank" rel="noopener">https://webpack.docschina.org/guides/code-splitting/#%E9%A2%84%E5%8F%96-%E9%A2%84%E5%8A%A0%E8%BD%BD%E6%A8%A1%E5%9D%97-prefetch-preload-module-</a></p>
+<p>[5] requestAnaimationFrame: <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame</a></p>
+<p>[6] requestIdleFrameCallback: <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestIdleCallback" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestIdleCallback</a></p>
+<p>[7] 一箩筐预加载技术  <a href="http://www.alloyteam.com/2015/10/prefetching-preloading-prebrowsing/" target="_blank" rel="noopener">http://www.alloyteam.com/2015/10/prefetching-preloading-prebrowsing/</a></p>
+<p>[8] react16 空闲检测算法  <a href="https://developers.google.com/web/updates/2015/08/using-requestidlecallback" target="_blank" rel="noopener">https://developers.google.com/web/updates/2015/08/using-requestidlecallback</a></p>
+<p>[9] 浏览器中的资源加载优先级控制： <a href="https://developers.google.com/web/fundamentals/performance/resource-prioritization#%E9%A2%84%E6%8F%90%E5%8F%96%E4%B8%8D%E4%BC%9A%E6%9B%BF%E6%8D%A2%E5%86%85%E5%AE%B9" target="_blank" rel="noopener">https://developers.google.com/web/fundamentals/performance/resource-prioritization#%E9%A2%84%E6%8F%90%E5%8F%96%E4%B8%8D%E4%BC%9A%E6%9B%BF%E6%8D%A2%E5%86%85%E5%AE%B9</a></p>
+<p>[10] setTimeout的最小延迟时间： <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setTimeout" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setTimeout</a></p>
+<p>附例</p>
+<p>[附1] 打车H5的预加载脑图</p>
+<p>[附2] 预加载评价指标在天网监控平台的配置</p>
+<p><a href="https://tw.sankuai.com/#/zone/40/view/15562" target="_blank" rel="noopener">https://tw.sankuai.com/#/zone/40/view/15562</a></p>
+
+    </div>
+</article>
+        </main>
+        <aside class="aside">
+            <div class="close"></div>
+            <section class="aside-section">
+                
+    <h1>Categories</h1>
+
+    
+
+            </section>
+            <section class="aside-section">
+                
+    <h1>Archives</h1>
+
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">2019</a></li></ul>
+
+
+            </section>
+            <section class="aside-section tag">
+                
+    <h1>Tags</h1>
+
+    
+
+            </section>
+        </aside>
+    </div>
+</body>
+
+</html>
