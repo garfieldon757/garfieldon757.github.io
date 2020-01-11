@@ -527,29 +527,29 @@ require(['jquery', 'util', 'valine', 'chart', 'registerSW', 'fancybox', 'confirm
       e = e || window.event
 
       // 判断浏览器IE，谷歌滑轮事件
-      if (e.wheelDelta) {
-        // 当滑轮向上滚动时
-        if (e.wheelDelta > 0) {
-          $('#side').removeClass('active')
-        }
+      // if (e.wheelDelta) {
+      //   // 当滑轮向上滚动时
+      //   if (e.wheelDelta > 0) {
+      //     $('#side').removeClass('active')
+      //   }
 
-        // 当滑轮向下滚动时
-        if (e.wheelDelta < 0) {
-          $('#side').addClass('active')
-        }
-      }
-      // Firefox滑轮事件
-      else if (e.detail) {
-        // 当滑轮向上滚动时
-        if (e.detail > 0) {
-          $('#side').removeClass('active')
-        }
+      //   // 当滑轮向下滚动时
+      //   if (e.wheelDelta < 0) {
+      //     $('#side').addClass('active')
+      //   }
+      // }
+      // // Firefox滑轮事件
+      // else if (e.detail) {
+      //   // 当滑轮向上滚动时
+      //   if (e.detail > 0) {
+      //     $('#side').removeClass('active')
+      //   }
 
-        // 当滑轮向下滚动时
-        if (e.detail < 0) {
-          $('#side').addClass('active')
-        }
-      }
+      //   // 当滑轮向下滚动时
+      //   if (e.detail < 0) {
+      //     $('#side').addClass('active')
+      //   }
+      // }
     }
 
     document.addEventListener && document.addEventListener('DOMMouseScroll', mousewheel, false) // firefox
