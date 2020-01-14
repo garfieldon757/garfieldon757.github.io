@@ -29,7 +29,7 @@
     
     <div id="post-toc" class="animated hiddenToc hide">
       <span class="title">Toc</span>
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#题目"><span class="toc-text">题目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解题思路"><span class="toc-text">解题思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-BF"><span class="toc-text">1.BF</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-贪心"><span class="toc-text">2.贪心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-分治"><span class="toc-text">3.分治</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-动态规划"><span class="toc-text">4.动态规划</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#题目"><span class="toc-text">题目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解题思路"><span class="toc-text">解题思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-暴力的递归算法"><span class="toc-text">1.暴力的递归算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-带备忘录的递归解法"><span class="toc-text">2.带备忘录的递归解法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-动态规划"><span class="toc-text">3.动态规划</span></a></li></ol></li></ol>
     </div>
     
     <div id="fixed-menu-wrap">
@@ -167,7 +167,10 @@
 <p>示例 1:</p>
 <p>输入: coins = [1, 2, 5], amount = 11<br>输出: 3<br>解释: 11 = 5 + 5 + 1<br>示例 2:</p>
 <p>输入: coins = [2], amount = 3<br>输出: -1<br>说明:<br>你可以认为每种硬币的数量是无限的。</p>
-<h2 id="解题思路">解题思路<a class="post-anchor" href="#解题思路"></a></h2><h3 id="1-BF">1.BF<a class="post-anchor" href="#1-BF"></a></h3><h3 id="2-贪心">2.贪心<a class="post-anchor" href="#2-贪心"></a></h3><h3 id="3-分治">3.分治<a class="post-anchor" href="#3-分治"></a></h3><h3 id="4-动态规划">4.动态规划<a class="post-anchor" href="#4-动态规划"></a></h3><p>假设 f(n) 代表要凑齐金额为 n 所要用的最少硬币数量，那么有：<br>f(n) = min(f(n - c1), f(n - c2), … f(n - cn)) + 1<br>其中 c1 ~ cn 为硬币的所有面额。</p>
+<h2 id="解题思路">解题思路<a class="post-anchor" href="#解题思路"></a></h2><p>假设 f(n) 代表要凑齐金额为 n 所要用的最少硬币数量，那么有：<br>f(n) = min(f(n - c1), f(n - c2), … f(n - cn)) + 1<br>其中 c1 ~ cn 为硬币的所有面额。</p>
+<h3 id="1-暴力的递归算法">1.暴力的递归算法<a class="post-anchor" href="#1-暴力的递归算法"></a></h3><p>暴力的递归算法，算法复杂度是O(2^n),指数爆炸复杂。<br>小结：算法效率低，因为递归过程中存在大量的重复过程，这种问题的性质抽象为“重叠子问题”。</p>
+<h3 id="2-带备忘录的递归解法">2.带备忘录的递归解法<a class="post-anchor" href="#2-带备忘录的递归解法"></a></h3><p>去除了重叠子问题，也可以说是对递归树的剪枝，去除了重复的子问题求解。算法复杂度降低为O(n)。<br>小结：这种从一个规模较大的问题，向下逐渐分解规模，知道f(1)、f(2)触底，然后逐层返回答案，这就叫做自顶向下。</p>
+<h3 id="3-动态规划">3.动态规划<a class="post-anchor" href="#3-动态规划"></a></h3><p>根据备忘录的启发，将这个备忘录独立为一张DP table，由底向上推算，更清晰。</p>
 
 
   
