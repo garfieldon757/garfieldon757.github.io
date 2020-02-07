@@ -27,6 +27,11 @@
   <body>
     <canvas id='pagemap'></canvas>
     
+    <div id="post-toc" class="animated hiddenToc hide">
+      <span class="title">Toc</span>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#非阻塞特性"><span class="toc-text">非阻塞特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Node中的JavaScript"><span class="toc-text">Node中的JavaScript</span></a></li></ol>
+    </div>
+    
     <div id="fixed-menu-wrap">
       <span class="iconfont icon-sousuo search-box menu-reset"></span>
       <span class="icon-toc menu-reset">Toc</span>
@@ -158,8 +163,23 @@
       <div>
       </div>
     </div>
-    <p>##非阻塞特性<br>单线程 回调机制  典型例子：AWS云-虚拟机<br>潜在问题：<br>  1.回调函数阻塞进程如何避免？<br>  2.共享同一进程资源，如何避免错误改动？ 1.错误监听处理；2.异步事件try…catch;<br>node和java优劣：<br>  node-IO密集型 基于v8-vm，诞生之初就是不是多CPU多内存<br>  java-CPU密集型</p>
-<p>##Node中的JavaScript<br>全局对象：global、process、console<br>模块系统：require、module、exports<br>  1.exports是module.exports的一个引用；<br>  2.exports默认返回对象，挂在各种属性，但也可以返回自定义属性，如方法；<br>事件对象：EventEmitter<br>内存分配：Buffer</p>
+    <h2 id="非阻塞特性">非阻塞特性<a class="post-anchor" href="#非阻塞特性"></a></h2><p>1.单线程 回调机制  典型例子：AWS云-虚拟机<br>2.潜在问题：</p>
+<ul>
+<li>回调函数阻塞进程如何避免？</li>
+<li>共享同一进程资源，如何避免错误改动？ 1.错误监听处理；2.异步事件try…catch;<br>3.node和java优劣：</li>
+<li>node-IO密集型 基于v8-vm，诞生之初就是不是多CPU多内存</li>
+<li>java-CPU密集型</li>
+</ul>
+<h2 id="Node中的JavaScript">Node中的JavaScript<a class="post-anchor" href="#Node中的JavaScript"></a></h2><ul>
+<li>全局对象：global、process、console</li>
+<li>模块系统：require、module、exports<ul>
+<li>exports是module.exports的一个引用；</li>
+<li>exports默认返回对象，挂在各种属性，但也可以返回自定义属性，如方法；</li>
+</ul>
+</li>
+<li>事件对象：EventEmitter</li>
+<li>内存分配：Buffer</li>
+</ul>
 
 
   
