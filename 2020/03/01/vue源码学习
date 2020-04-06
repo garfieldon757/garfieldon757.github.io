@@ -1,1 +1,23 @@
+
 1.源码目录
+- flow.js 动态类型检查工具，vue2集成
+- vue目录结构
+  - src
+   - compiler  编译相关template to render-function
+   - core   Vue 实例化 响应式observer 一些内置组件  vdom utils
+   - platform web/weex
+   - server  ssr
+   - sfc component to vue-object
+- vue源码构建
+  基于rollup, src to dist, npm 通过package.json管理
+  npm script 管理配置文件
+  编译时间可选：在构建期编译 或 在运行时编译，区别是构建期基于vue-loader将.vue to .js,并通过render方法连接
+- 从入口开始
+  1.package.json-script-npm run build指令指定了vue入口文件
+    src/platform/web/entry-runtime-with-compiler.js
+  2.从入口文件逐级寻找vue的定义文件 
+    src/core/index -> src/core/instance/index
+  小结：Vue本质上就是一个用Function实现的Class，在它的原型和本身构造函数都扩展了属性/方法
+
+2.数据驱动
+
