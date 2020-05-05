@@ -168,21 +168,21 @@
 </ul>
 <p>baseController.ts</p>
 <blockquote>
-<p>class baseController {<br>  constructor () {<br>    const baseService = new BaseService();<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor () {<br>    const baseService = new BaseModel();<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor () {<br>    // ..<br>  }<br>}<br>以此为例，MVC架构下，一个请求的基本处理过程是controller&gt;service&gt;dao，目前看起啦没有什么问题。<br>但是，如果我们对Dao层的构造器需要参数传入，那么改造后的代码如下：<br>baseController.ts<br>class baseController {<br>  constructor () {<br>    const newParam = ‘someParam’;<br>    const baseService = new BaseService(newParam);<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor (newParam) {<br>    const baseService = new BaseModel(newParam);<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}<br>综上，我们可以看到，在dao层这样一个小小的改动，会影响到所有的上层调用方，明显是一种高耦合性的case。如何解决这个问题呢？</p>
+<p>class baseController {<br>  constructor () {<br>    const baseService = new BaseService();<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor () {<br>    const baseService = new BaseModel();<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor () {<br>    // ..<br>  }<br>}</p>
 </blockquote>
+<p>以此为例，MVC架构下，一个请求的基本处理过程是controller&gt;service&gt;dao，目前看起啦没有什么问题。<br>但是，如果我们对Dao层的构造器需要参数传入，那么改造后的代码如下：</p>
+<p>baseController.ts</p>
+<blockquote>
+<p>class baseController {<br>  constructor () {<br>    const newParam = ‘someParam’;<br>    const baseService = new BaseService(newParam);<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor (newParam) {<br>    const baseService = new BaseModel(newParam);<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
+</blockquote>
+<p>综上，我们可以看到，在dao层这样一个小小的改动，会影响到所有的上层调用方，明显是一种高耦合性的case。如何解决这个问题呢？</p>
 <ul>
 <li>Ioc控制反转的诞生<br>我们提出了控制反转Ioc这样的概念，什么叫做控制反转呢？<br>就是原先我们调用方来控制被调用方，需要生成一个新对象并缓存等工作。<br>现在我们把被调用方控制权交给第三方的控制容器，也就是说调用方不再需要管理被调用方的初始化工作了，这些事情全部由控制容器管理。<br>具体是怎么实现的呢？</li>
 </ul>
 <p>baseController.ts</p>
 <blockquote>
+<p>@controller(‘base’)<br>class baseController {<br>  constructor (private baseSerivce: BaseService) {<br>    // ..直接使用baseService<br>  }<br>  getId() {}<br>}<br>baseService.ts<br>@Injectable()<br>class baseService {<br>  constructor (private baseDao: BaseDao) {<br>    // .. 直接使用baseDao<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>@Injectable()<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
 </blockquote>
-<p>@controller(‘base’)<br>class baseController {<br>  constructor (private baseSerivce: BaseService) {<br>    // ..直接使用baseService<br>  }<br>  getId() {}<br>}<br>baseService.ts</p>
-<blockquote>
-</blockquote>
-<p>@Injectable()<br>class baseService {<br>  constructor (private baseDao: BaseDao) {<br>    // .. 直接使用baseDao<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts</p>
-<blockquote>
-</blockquote>
-<p>@Injectable()<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
 <ul>
 <li>Ioc的应用</li>
 </ul>
