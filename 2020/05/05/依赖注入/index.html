@@ -27,6 +27,11 @@
   <body>
     <canvas id='pagemap'></canvas>
     
+    <div id="post-toc" class="animated hiddenToc hide">
+      <span class="title">Toc</span>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#技术基础"><span class="toc-text">技术基础</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Ioc控制反转的诞生"><span class="toc-text">Ioc控制反转的诞生</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Ioc的应用"><span class="toc-text">Ioc的应用</span></a></li></ol>
+    </div>
+    
     <div id="fixed-menu-wrap">
       <span class="iconfont icon-sousuo search-box menu-reset"></span>
       <span class="icon-toc menu-reset">Toc</span>
@@ -158,35 +163,28 @@
       <div>
       </div>
     </div>
-    <ul>
-<li>前言<br>借着工作中拓展技术栈为目的的项目，接触了后台nestjs框架，看到介绍这个框架是nodejs语言基础上，采用和Spring MVC架构相似的设计思路，用来给用户的服务开发工作提供框架层面的支持。既然是同类型的框架，那么他们的核心原理也是一致的，于是从新了解了框架的核心设计模式-控制反转Ioc。</li>
-<li>技术基础</li>
-</ul>
-<ul>
+    <h1 id="前言">前言<a class="post-anchor" href="#前言"></a></h1><p>借着工作中拓展技术栈为目的的项目，接触了后台nestjs框架，看到介绍这个框架是nodejs语言基础上，采用和Spring MVC架构相似的设计思路，用来给用户的服务开发工作提供框架层面的支持。既然是同类型的框架，那么他们的核心原理也是一致的，于是从新了解了框架的核心设计模式-控制反转Ioc。</p>
+<h1 id="技术基础">技术基础<a class="post-anchor" href="#技术基础"></a></h1><ol>
 <li>MVC分层架构<br>在了解Ioc之前，我们先得了解MVC的概念。<br>MVC架构分别代指Modal、View、Controller，分别用来面向数据管理，视图管理，路由管理等核心层级。<br>分层后层级间类的依次调用，构成了整个项目的分层体系架构，这样做的好处是将不同的工作类型解耦，提高代码可扩展程度。</li>
 <li>MVC下耦合性问题<br>但是面向对象的语言，在分级架构下，会存在另一种常见的问题，对耦合程度的提升影响较大，简述如下：</li>
-</ul>
+</ol>
 <p>baseController.ts</p>
-<blockquote>
-<p>class baseController {<br>  constructor () {<br>    const baseService = new BaseService();<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor () {<br>    const baseService = new BaseModel();<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor () {<br>    // ..<br>  }<br>}</p>
-</blockquote>
-<p>以此为例，MVC架构下，一个请求的基本处理过程是controller&gt;service&gt;dao，目前看起啦没有什么问题。<br>但是，如果我们对Dao层的构造器需要参数传入，那么改造后的代码如下：</p>
-<p>baseController.ts</p>
-<blockquote>
-<p>class baseController {<br>  constructor () {<br>    const newParam = ‘someParam’;<br>    const baseService = new BaseService(newParam);<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor (newParam) {<br>    const baseService = new BaseModel(newParam);<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
-</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class baseController &#123;</span><br><span class="line">  constructor () &#123;</span><br><span class="line">    const baseService &#x3D; new BaseService();</span><br><span class="line">  &#125;</span><br><span class="line">  getId() &#123; &#x2F;&#x2F;... &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">baseService.ts</span><br></pre></td></tr></table></figure>
+<p>class baseService {<br>  constructor () {<br>    const baseService = new BaseModel();<br>  }<br>  baseDao() {}<br>}</p>
+<p>baseDao.ts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class baseDao() &#123;</span><br><span class="line">  constructor () &#123;</span><br><span class="line">    &#x2F;&#x2F; ..</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">以此为例，MVC架构下，一个请求的基本处理过程是controller&gt;service&gt;dao，目前看起啦没有什么问题。 </span><br><span class="line">但是，如果我们对Dao层的构造器需要参数传入，那么改造后的代码如下：</span><br><span class="line"></span><br><span class="line">baseController.ts</span><br></pre></td></tr></table></figure>
+<p>class baseController {<br>  constructor () {<br>    const newParam = ‘someParam’;<br>    const baseService = new BaseService(newParam);<br>  }<br>  getId() { //… }<br>}</p>
+<p>baseService.ts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class baseService &#123;</span><br><span class="line">  constructor (newParam) &#123;</span><br><span class="line">    const baseService &#x3D; new BaseModel(newParam);</span><br><span class="line">  &#125;</span><br><span class="line">  baseDao() &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">baseDao.ts</span><br></pre></td></tr></table></figure>
+<p>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
 <p>综上，我们可以看到，在dao层这样一个小小的改动，会影响到所有的上层调用方，明显是一种高耦合性的case。如何解决这个问题呢？</p>
-<ul>
-<li>Ioc控制反转的诞生<br>我们提出了控制反转Ioc这样的概念，什么叫做控制反转呢？<br>就是原先我们调用方来控制被调用方，需要生成一个新对象并缓存等工作。<br>现在我们把被调用方控制权交给第三方的控制容器，也就是说调用方不再需要管理被调用方的初始化工作了，这些事情全部由控制容器管理。<br>具体是怎么实现的呢？</li>
-</ul>
+<h1 id="Ioc控制反转的诞生">Ioc控制反转的诞生<a class="post-anchor" href="#Ioc控制反转的诞生"></a></h1><p>我们提出了控制反转Ioc这样的概念，什么叫做控制反转呢？<br>就是原先我们调用方来控制被调用方，需要生成一个新对象并缓存等工作。<br>现在我们把被调用方控制权交给第三方的控制容器，也就是说调用方不再需要管理被调用方的初始化工作了，这些事情全部由控制容器管理。<br>具体是怎么实现的呢？</p>
 <p>baseController.ts</p>
-<blockquote>
-<p>@controller(‘base’)<br>class baseController {<br>  constructor (private baseSerivce: BaseService) {<br>    // ..直接使用baseService<br>  }<br>  getId() {}<br>}<br>baseService.ts<br>@Injectable()<br>class baseService {<br>  constructor (private baseDao: BaseDao) {<br>    // .. 直接使用baseDao<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>@Injectable()<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
-</blockquote>
-<ul>
-<li>Ioc的应用</li>
-</ul>
-<ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@controller(&#39;base&#39;)</span><br><span class="line">class baseController &#123;</span><br><span class="line">  constructor (private baseSerivce: BaseService) &#123;</span><br><span class="line">    &#x2F;&#x2F; ..直接使用baseService</span><br><span class="line">  &#125;</span><br><span class="line">  getId() &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">baseService.ts</span><br></pre></td></tr></table></figure>
+<p>@Injectable()<br>class baseService {<br>  constructor (private baseDao: BaseDao) {<br>    // .. 直接使用baseDao<br>  }<br>  baseDao() {}<br>}</p>
+<p>baseDao.ts</p>
+<p>```<br>@Injectable()<br>class baseDao() {<br>  constructor (newParam) {}<br>}</p>
+<h1 id="Ioc的应用">Ioc的应用<a class="post-anchor" href="#Ioc的应用"></a></h1><ol>
 <li>后台应用<ul>
 <li>Spring MVC</li>
 <li>nestjs</li>
@@ -197,7 +195,7 @@
 <li>Vue2.2开始，也支持了和Angular同样的能力。</li>
 </ul>
 </li>
-</ul>
+</ol>
 
 
   
