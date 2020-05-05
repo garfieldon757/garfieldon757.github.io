@@ -16,7 +16,7 @@
     <meta name="description" content="" />
     
     <title>
-      vue源码学习 - 你为什么要点进来？？？
+      Archives2020/5 - 你为什么要点进来？？？
     </title>
     <link rel="manifest" href="/manifest.json" />
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
@@ -139,109 +139,43 @@
     </div>
     <div id="container">
       <div class="main animated bounceInRight delay-0.7s">
-        <article class="post-entry">
-    <div class="header">
-      
-      <div class="title">vue源码学习</div>
-      <div class="meta">
-        <span class="item">
-          <span class="iconfont icon-time-circle"></span>
-          <span>2020/04/06</span>
-        </span>
-
-        
-
-        
-        
-        
-      </div>
-      <div>
-      </div>
-    </div>
-    <p>1.源码目录</p>
-<ul>
-<li>flow.js 动态类型检查工具，vue2集成</li>
-<li>vue目录结构<ul>
-<li>src<ul>
-<li>compiler  编译相关template to render-function</li>
-<li>core   Vue 实例化 响应式observer 一些内置组件  vdom utils</li>
-<li>platform web/weex</li>
-<li>server  ssr</li>
-<li>sfc component to vue-object</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>vue源码构建<br>基于rollup, src to dist, npm 通过package.json管理<br>npm script 管理配置文件<br>编译时间可选：在构建期编译 或 在运行时编译，区别是构建期基于vue-loader&gt;将.vue to .js,并通过render方法连接</li>
-<li>从入口开始<br>1.package.json-script-npm run build指令指定了vue入口文件<br>  src/platform/web/entry-runtime-with-compiler.js<br>2.从入口文件逐级寻找vue的定义文件<br>  src/core/index -&gt; src/core/instance/index<br>小结：Vue本质上就是一个用Function实现的Class，在它的原型和本身构造函数&gt;都扩展了属性/方法</li>
-</ul>
-<p>2.数据驱动<br>  demo项目调试vue源码技巧：在node_module对应的vue.js中加断点</p>
-<ul>
-<li>new Vue发生了什么?<ul>
-<li>this._init():  初始化生命周期/事件中心/渲染/初始化data、props、computed\watcher等<br>以initData为例  vm._data.xxx key管理<br>TODO：1.markStartTag/markEndTag像是记录vue初始化性能，关注如何获取数据，vue-devtools？ <pre><code>2.H5项目，main.js的运行时间中，new Vue是哪一段？
-3.callHool修改生命周期，阅读H5项目源码，理解类似抽象逻辑处理思路。</code></pre></li>
-</ul>
-</li>
-<li>vue实例挂载<ul>
-<li>$mount如何实现？<br>  通过渲染watcher注册，触发mountComponent函数（新建vnode+触发el._update）<br>TODO：1. render函数是什么意思？html字符串 or to virtual-dom？</li>
-</ul>
-</li>
-</ul>
-
-
-  
-    <div class="post-reward">
-    <div id="reward-button">打赏</div>
-      <div id="qr">
-        <div class="wrap">
-            
-            <div class="bg-wrap">
-              <a href="/images/zhifubao.png" target="_block" class="bg" style="background-image:url('/images/zhifubao.png')"></a>
-              支付宝
-            </div>
-            
-            
-            <div class="bg-wrap">
-                <a href="/images/weixin.png" target="_block" class="bg" style="background-image:url('/images/weixin.png')"></a>
-              微信
-            </div>
-            
+        <div id="archives">
+    
+        <div class="title">
+            Archives 
+             - 2020/5
         </div>
-      </div>
-    </div>
-  
-  <div class="post-guide">
-    <div class="item left">
-        
-          <a href="/2020/05/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">依赖注入</a>
-        
-    </div>
-    <div class="item right">
-        
-          <a href="/2020/03/01/%E5%AF%86%E7%A0%81%E5%AD%A6%E6%A6%82%E8%BF%B0/">密码学概述</a>
-        
-    </div>
-  </div>
+    
 
-  
 
-  <div class="post-copyright">
-    <div class="auth">
-      本文作者：<a href="http://yoursite.com">oliverfan</a>
-    </div>
-    <div class="link">
-      永久链接：<a href="http://yoursite.com/2020/04/06/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/">http://yoursite.com/2020/04/06/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/</a>
-    </div>
-    <div class="declare">
-      版权声明：本文首发于<a href="http://yoursite.com">oliverfan</a>的博客，转载请注明出处！
-    </div>
-  </div>
 
-  <div id="comment"></div>
 
-  
-  
-</article>
+    
+    
+    <section class="wrap">
+        <div class="meta">
+            <a href="/archives/2020" >
+                2020
+            </a>
+        </div>
+        <div class="year">
+            
+            <article class="item">
+            <a href="/2020/05/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/" title="依赖注入">
+                <span>2020/05/05</span>
+                <span>依赖注入</span>
+            </a>
+            </article>
+            
+    
+        </div>
+    </section>
+      
+<div class="paginator">
+    <span class="page-number current">1</span>
+</div>
+</div>
+
         <footer>
           <div class="copyright">
             ©2020

@@ -16,7 +16,7 @@
     <meta name="description" content="" />
     
     <title>
-      vue源码学习 - 你为什么要点进来？？？
+      依赖注入 - 你为什么要点进来？？？
     </title>
     <link rel="manifest" href="/manifest.json" />
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
@@ -142,11 +142,11 @@
         <article class="post-entry">
     <div class="header">
       
-      <div class="title">vue源码学习</div>
+      <div class="title">依赖注入</div>
       <div class="meta">
         <span class="item">
           <span class="iconfont icon-time-circle"></span>
-          <span>2020/04/06</span>
+          <span>2020/05/05</span>
         </span>
 
         
@@ -158,32 +158,43 @@
       <div>
       </div>
     </div>
-    <p>1.源码目录</p>
+    <ul>
+<li>前言<br>借着工作中拓展技术栈为目的的项目，接触了后台nestjs框架，看到介绍这个框架是nodejs语言基础上，采用和Spring MVC架构相似的设计思路，用来给用户的服务开发工作提供框架层面的支持。既然是同类型的框架，那么他们的核心原理也是一致的，于是从新了解了框架的核心设计模式-控制反转Ioc。</li>
+<li>技术基础</li>
+</ul>
 <ul>
-<li>flow.js 动态类型检查工具，vue2集成</li>
-<li>vue目录结构<ul>
-<li>src<ul>
-<li>compiler  编译相关template to render-function</li>
-<li>core   Vue 实例化 响应式observer 一些内置组件  vdom utils</li>
-<li>platform web/weex</li>
-<li>server  ssr</li>
-<li>sfc component to vue-object</li>
+<li>MVC分层架构<br>在了解Ioc之前，我们先得了解MVC的概念。<br>MVC架构分别代指Modal、View、Controller，分别用来面向数据管理，视图管理，路由管理等核心层级。<br>分层后层级间类的依次调用，构成了整个项目的分层体系架构，这样做的好处是将不同的工作类型解耦，提高代码可扩展程度。</li>
+<li>MVC下耦合性问题<br>但是面向对象的语言，在分级架构下，会存在另一种常见的问题，对耦合程度的提升影响较大，简述如下：</li>
 </ul>
-</li>
-</ul>
-</li>
-<li>vue源码构建<br>基于rollup, src to dist, npm 通过package.json管理<br>npm script 管理配置文件<br>编译时间可选：在构建期编译 或 在运行时编译，区别是构建期基于vue-loader&gt;将.vue to .js,并通过render方法连接</li>
-<li>从入口开始<br>1.package.json-script-npm run build指令指定了vue入口文件<br>  src/platform/web/entry-runtime-with-compiler.js<br>2.从入口文件逐级寻找vue的定义文件<br>  src/core/index -&gt; src/core/instance/index<br>小结：Vue本质上就是一个用Function实现的Class，在它的原型和本身构造函数&gt;都扩展了属性/方法</li>
-</ul>
-<p>2.数据驱动<br>  demo项目调试vue源码技巧：在node_module对应的vue.js中加断点</p>
+<p>baseController.ts</p>
+<blockquote>
+<p>class baseController {<br>  constructor () {<br>    const baseService = new BaseService();<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor () {<br>    const baseService = new BaseModel();<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor () {<br>    // ..<br>  }<br>}<br>以此为例，MVC架构下，一个请求的基本处理过程是controller&gt;service&gt;dao，目前看起啦没有什么问题。<br>但是，如果我们对Dao层的构造器需要参数传入，那么改造后的代码如下：<br>baseController.ts<br>class baseController {<br>  constructor () {<br>    const newParam = ‘someParam’;<br>    const baseService = new BaseService(newParam);<br>  }<br>  getId() { //… }<br>}<br>baseService.ts<br>class baseService {<br>  constructor (newParam) {<br>    const baseService = new BaseModel(newParam);<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}<br>综上，我们可以看到，在dao层这样一个小小的改动，会影响到所有的上层调用方，明显是一种高耦合性的case。如何解决这个问题呢？</p>
+</blockquote>
 <ul>
-<li>new Vue发生了什么?<ul>
-<li>this._init():  初始化生命周期/事件中心/渲染/初始化data、props、computed\watcher等<br>以initData为例  vm._data.xxx key管理<br>TODO：1.markStartTag/markEndTag像是记录vue初始化性能，关注如何获取数据，vue-devtools？ <pre><code>2.H5项目，main.js的运行时间中，new Vue是哪一段？
-3.callHool修改生命周期，阅读H5项目源码，理解类似抽象逻辑处理思路。</code></pre></li>
+<li>Ioc控制反转的诞生<br>我们提出了控制反转Ioc这样的概念，什么叫做控制反转呢？<br>就是原先我们调用方来控制被调用方，需要生成一个新对象并缓存等工作。<br>现在我们把被调用方控制权交给第三方的控制容器，也就是说调用方不再需要管理被调用方的初始化工作了，这些事情全部由控制容器管理。<br>具体是怎么实现的呢？</li>
+</ul>
+<p>baseController.ts</p>
+<blockquote>
+</blockquote>
+<p>@controller(‘base’)<br>class baseController {<br>  constructor (private baseSerivce: BaseService) {<br>    // ..直接使用baseService<br>  }<br>  getId() {}<br>}<br>baseService.ts</p>
+<blockquote>
+</blockquote>
+<p>@Injectable()<br>class baseService {<br>  constructor (private baseDao: BaseDao) {<br>    // .. 直接使用baseDao<br>  }<br>  baseDao() {}<br>}<br>baseDao.ts</p>
+<blockquote>
+</blockquote>
+<p>@Injectable()<br>class baseDao() {<br>  constructor (newParam) {<br>    // ..<br>  }<br>}</p>
+<ul>
+<li>Ioc的应用</li>
+</ul>
+<ul>
+<li>后台应用<ul>
+<li>Spring MVC</li>
+<li>nestjs</li>
 </ul>
 </li>
-<li>vue实例挂载<ul>
-<li>$mount如何实现？<br>  通过渲染watcher注册，触发mountComponent函数（新建vnode+触发el._update）<br>TODO：1. render函数是什么意思？html字符串 or to virtual-dom？</li>
+<li>前台应用<ul>
+<li>前台最初引入Ioc设计模式的地方时前端框架Angular，通过依赖注入DI，可以提供组件间跨级通信的能力；</li>
+<li>Vue2.2开始，也支持了和Angular同样的能力。</li>
 </ul>
 </li>
 </ul>
@@ -213,12 +224,10 @@
   <div class="post-guide">
     <div class="item left">
         
-          <a href="/2020/05/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">依赖注入</a>
-        
     </div>
     <div class="item right">
         
-          <a href="/2020/03/01/%E5%AF%86%E7%A0%81%E5%AD%A6%E6%A6%82%E8%BF%B0/">密码学概述</a>
+          <a href="/2020/04/06/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/">vue源码学习</a>
         
     </div>
   </div>
@@ -230,7 +239,7 @@
       本文作者：<a href="http://yoursite.com">oliverfan</a>
     </div>
     <div class="link">
-      永久链接：<a href="http://yoursite.com/2020/04/06/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/">http://yoursite.com/2020/04/06/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/</a>
+      永久链接：<a href="http://yoursite.com/2020/05/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">http://yoursite.com/2020/05/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/</a>
     </div>
     <div class="declare">
       版权声明：本文首发于<a href="http://yoursite.com">oliverfan</a>的博客，转载请注明出处！
